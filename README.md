@@ -1,2 +1,9 @@
 # fp-ts-playground
-Functional-programing playground
+
+Functional-programming playground
+
+# Run
+
+`yarn`
+
+`yarn test`
