@@ -1,5 +1,5 @@
 import * as fc from "fast-check";
-import { isLeft, isRight } from "fp-ts/lib/Either";
+import { isLeft, isRight } from "fp-ts/Either";
 import { InMemoryUserRepository } from "../../infrastructure";
 import { UserArbitrary } from "../../test";
 import { registerUser } from "./registerUser";

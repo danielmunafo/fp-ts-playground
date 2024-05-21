@@ -1,14 +1,12 @@
-// src/infrastructure/InMemoryUserRepository.test.ts
-
-import * as fc from "fast-check";
+import { assert, asyncProperty } from "fast-check";
 import { isLeft, isRight } from "fp-ts/Either";
 import { UserArbitrary } from "../../test";
 import { InMemoryUserRepository } from "./InMemoryUserRepository";
 
 describe("InMemoryUserRepository", () => {
   it("should save unique users and reject duplicates", async () => {
-    await fc.assert(
-      fc.asyncProperty(UserArbitrary(), async (user) => {
+    await assert(
+      asyncProperty(UserArbitrary(), async (user) => {
         const repository = new InMemoryUserRepository();
 
         // First save should succeed
