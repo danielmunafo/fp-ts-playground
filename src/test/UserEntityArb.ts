@@ -1,10 +1,10 @@
-import { Arbitrary, string } from "fast-check";
+import { Arbitrary, emailAddress, string, uuidV } from "fast-check";
 import { User } from "../core";
 
 export const UserArbitrary = (): Arbitrary<User> => {
-  return string().chain((id) =>
+  return uuidV(4).chain((id) =>
     string().chain((name) =>
-      string().map(
+      emailAddress().map(
         (email): User => ({
           id,
           name,

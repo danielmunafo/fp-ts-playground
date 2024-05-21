@@ -1,5 +1,5 @@
-import { Option } from "fp-ts/lib/Option";
-import { TaskEither } from "fp-ts/lib/TaskEither";
+import { Option } from "fp-ts/Option";
+import { TaskEither } from "fp-ts/TaskEither";
 import { User } from "../domain";
 
 export type UserRepositoryPort = {
