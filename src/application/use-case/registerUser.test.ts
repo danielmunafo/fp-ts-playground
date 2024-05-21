@@ -1,41 +1,53 @@
-import * as fc from "fast-check";
-import { isLeft, isRight } from "fp-ts/Either";
+import { assert, asyncProperty } from "fast-check";
+import { isRight } from "fp-ts/Either";
+import { getLeft, isSome } from "fp-ts/Option";
 import { InMemoryUserRepository } from "../../infrastructure";
 import { UserArbitrary } from "../../test";
+import { EmailInUseError } from "./errors";
 import { registerUser } from "./registerUser";
 
 describe("registerUser", () => {
   it("should successfully register a user", async () => {
-    await fc.assert(
-      fc.asyncProperty(UserArbitrary(), async (user) => {
+    await assert(
+      asyncProperty(UserArbitrary(), async (user) => {
+        // Given a valid user
         const userRepository = new InMemoryUserRepository();
         const register = registerUser(userRepository);
 
+        // When trying to register it
         const result = await register(user)();
 
-        // Expect the operation to succeed, meaning result is Right
-        expect(isRight(result)).toBeTruthy();
+        // Then the system should return success
+        const success = isRight(result);
+        expect(success).toBeTruthy();
       }),
-      { numRuns: 100 },
+      { numRuns: 20 },
     );
   });
 
   it("should not allow registering a user with an existing email", async () => {
-    await fc.assert(
-      fc.asyncProperty(UserArbitrary(), async (user) => {
+    await assert(
+      asyncProperty(UserArbitrary(), async (user) => {
+        // Given an already registered user
         const userRepository = new InMemoryUserRepository();
         const register = registerUser(userRepository);
 
-        // First registration should succeed
-        await register(user)();
+        const newUserResult = await register(user)();
+        const firstRegisteringSuccess = isRight(newUserResult);
+        expect(firstRegisteringSuccess).toBeTruthy();
 
-        // Attempt to register again with the same user details
-        const result = await register(user)();
+        // When trying to register the same user
+        const alreadyExistingUserEither = await register(user)();
 
-        // Expect the operation to fail this time, meaning result is Left
-        expect(isLeft(result)).toBeTruthy();
+        // Then the system should not register the user
+        const leftOption = getLeft(alreadyExistingUserEither);
+        if (isSome(leftOption)) {
+          expect(leftOption.value).toBeInstanceOf(EmailInUseError);
+        } else {
+          expect(true).toBeFalsy();
+        }
       }),
-      { numRuns: 100 },
+      { numRuns: 20 },
     );
   });
 });

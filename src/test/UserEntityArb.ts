@@ -1,16 +1,17 @@
-import { Arbitrary, emailAddress, string, uuidV } from "fast-check";
+import {
+  Arbitrary,
+  constant,
+  emailAddress,
+  record,
+  string,
+  uuidV,
+} from "fast-check";
 import { User } from "../core";
 
-export const UserArbitrary = (): Arbitrary<User> => {
-  return uuidV(4).chain((id) =>
-    string().chain((name) =>
-      emailAddress().map(
-        (email): User => ({
-          id,
-          name,
-          email,
-        }),
-      ),
-    ),
-  );
+export const UserArbitrary = (overrides?: Partial<User>): Arbitrary<User> => {
+  return record({
+    id: overrides?.id ? constant(overrides.id) : uuidV(4),
+    name: overrides?.name ? constant(overrides.name) : string(),
+    email: overrides?.email ? constant(overrides.email) : emailAddress(),
+  });
 };

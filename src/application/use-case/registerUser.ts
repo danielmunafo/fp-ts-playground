@@ -6,13 +6,12 @@ import { EmailInUseError } from "./errors";
 
 export const registerUser =
   (userRepository: UserRepositoryPort) =>
-  (userData: User): TE.TaskEither<Error, void> =>
+  (userData: User): TE.TaskEither<Error, string> =>
     pipe(
       userRepository.findByEmail(userData.email),
-      TE.chain(
-        (optionUser) =>
-          O.isNone(optionUser)
-            ? userRepository.save(userData) // If no user is found, proceed with save
-            : TE.left(new EmailInUseError("Email is already in use")), // If user exists, return error
+      TE.chain((optionUser) =>
+        O.isNone(optionUser)
+          ? userRepository.save(userData)
+          : TE.left(new EmailInUseError()),
       ),
     );

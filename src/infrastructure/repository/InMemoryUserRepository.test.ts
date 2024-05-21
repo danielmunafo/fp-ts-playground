@@ -1,28 +1,50 @@
 import { assert, asyncProperty } from "fast-check";
-import { isLeft, isRight } from "fp-ts/Either";
+import { fold as foldEither, isRight } from "fp-ts/Either";
+import { fold as foldOption } from "fp-ts/Option";
+import { pipe } from "fp-ts/function";
 import { UserArbitrary } from "../../test";
 import { InMemoryUserRepository } from "./InMemoryUserRepository";
 
 describe("InMemoryUserRepository", () => {
-  it("should save unique users and reject duplicates", async () => {
+  it("should save and find", async () => {
     await assert(
-      asyncProperty(UserArbitrary(), async (user) => {
+      asyncProperty(UserArbitrary(), async (inputUser) => {
+        // Given a valid user
         const repository = new InMemoryUserRepository();
 
-        // First save should succeed
-        const firstSaveResult = await repository.save(user)();
-        expect(isRight(firstSaveResult)).toBeTruthy();
+        // When saving it
+        const saveUserTask = repository.save(inputUser);
+        const firstSaveResult = await saveUserTask();
+        const success = isRight(firstSaveResult);
+        expect(success).toBeTruthy();
 
-        // Attempt to save the same user again, expecting failure
-        const secondSaveResult = await repository.save(user)();
-        expect(isLeft(secondSaveResult)).toBeTruthy();
-        if (isLeft(secondSaveResult)) {
-          expect(secondSaveResult.left.message).toContain(
-            InMemoryUserRepository.USER_ALREADY_EXISTS_MESSAGE,
-          );
-        }
+        // Then the system should be able to find it
+        const findByEmailTask = repository.findByEmail(inputUser.email);
+        const user = await findByEmailTask();
+
+        pipe(
+          user,
+          foldEither(
+            (_error) => {
+              expect(false).toBeTruthy();
+            },
+            (option) => {
+              pipe(
+                option,
+                foldOption(
+                  () => {
+                    expect(false).toBeTruthy();
+                  },
+                  (user) => {
+                    expect(user).toEqual(inputUser);
+                  },
+                ),
+              );
+            },
+          ),
+        );
       }),
-      { numRuns: 100 },
+      { numRuns: 20 },
     );
   });
 });

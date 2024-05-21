@@ -1,6 +1,9 @@
 export class EmailInUseError extends Error {
-  constructor(message: string) {
+  public static readonly DEFAULT_MESSAGE = "Email is already in use";
+  public static readonly DEFAULT_NAME = "EmailInUseError";
+
+  constructor(message: string = EmailInUseError.DEFAULT_MESSAGE) {
     super(message);
-    this.name = "EmailInUseError";
+    this.name = EmailInUseError.DEFAULT_NAME;
   }
 }

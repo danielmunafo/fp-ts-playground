@@ -1,20 +1,23 @@
 import { Option, none, some } from "fp-ts/Option";
-import * as TE from "fp-ts/TaskEither";
+import { TaskEither, right, tryCatch } from "fp-ts/TaskEither";
 import { User, UserRepositoryPort } from "../../core";
 
-export class InMemoryUserRepository implements UserRepositoryPort {
-  private users: User[] = [];
-  public static USER_ALREADY_EXISTS_MESSAGE = "User already exists";
+export enum SaveResult {
+  Update = "update",
+  Create = "create",
+}
 
-  save = (user: User): TE.TaskEither<Error, void> =>
-    TE.tryCatch(
-      () => {
-        const existingUser = this.users.find((u) => u.email === user.email);
-        if (existingUser) {
-          throw new Error(InMemoryUserRepository.USER_ALREADY_EXISTS_MESSAGE);
-        }
-        this.users.push(user);
-        return Promise.resolve();
+export class InMemoryUserRepository implements UserRepositoryPort {
+  private users: Map<string, User> = new Map();
+
+  save = (user: User): TaskEither<Error, SaveResult> =>
+    tryCatch(
+      async () => {
+        const userEmail = user.email;
+        const existingUser = this.users.get(userEmail);
+        const message = existingUser ? SaveResult.Create : SaveResult.Update;
+        this.users.set(userEmail, user);
+        return message;
       },
       (reason: unknown) =>
         new Error(
@@ -22,11 +25,8 @@ export class InMemoryUserRepository implements UserRepositoryPort {
         ),
     );
 
-  findByEmail = (email: string): TE.TaskEither<Error, Option<User>> =>
-    TE.right(
-      this.users.reduce<Option<User>>(
-        (acc, user) => (user.email === email ? some(user) : acc),
-        none,
-      ),
-    );
+  findByEmail = (email: string): TaskEither<Error, Option<User>> => {
+    const user = this.users.get(email);
+    return right(user ? some(user) : none);
+  };
 }
