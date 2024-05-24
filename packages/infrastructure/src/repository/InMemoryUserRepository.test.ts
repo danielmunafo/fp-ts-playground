@@ -1,8 +1,8 @@
+import { UserArbitrary } from "@fp-ts-playground/core";
 import { assert, asyncProperty } from "fast-check";
 import { fold as foldEither, isRight } from "fp-ts/Either";
 import { fold as foldOption } from "fp-ts/Option";
 import { pipe } from "fp-ts/function";
-import { UserArbitrary } from "../../test";
 import { InMemoryUserRepository } from "./InMemoryUserRepository";
 
 describe("InMemoryUserRepository", () => {

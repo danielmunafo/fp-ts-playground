@@ -1,7 +1,7 @@
 import { assert, property } from "fast-check";
 import { isLeft, isRight } from "fp-ts/Either";
-import { UserArbitrary } from "../../../test";
 import { validateUser } from "./UserEntity";
+import { UserArbitrary } from "./UserEntityArb";
 
 describe("User entity", () => {
   it("should conform to the User domain model", () => {

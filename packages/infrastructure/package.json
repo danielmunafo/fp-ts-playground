@@ -1,0 +1,17 @@
+{
+  "name": "@fp-ts-playground/infrastructure",
+  "version": "1.0.0",
+  "description": "Infrastructure package",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
+  "author": "dann.tostes@gmail.com",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@fp-ts-playground/core": "*"
+  }
+}

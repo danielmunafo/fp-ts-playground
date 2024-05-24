@@ -5,9 +5,13 @@
   "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
   "author": "dann.tostes@gmail.com",
   "license": "MIT",
-  "private": false,
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.57.0",
@@ -27,7 +31,10 @@
     "npm": ">= 10"
   },
   "scripts": {
-    "dev": "ts-node ./src/index.ts",
+    "build": "yarn clean && yarn workspaces run build",
+    "clean": "rm -rf packages/*/dist && rm -rf packages/*/tsconfig.tsbuildinfo.json",
+    "clean:all": "rm -rf node_modules && rm -rf packages/*/dist",
+    "dev": "ts-node ./example/index.ts",
     "test": "jest",
     "prettify": "prettier . --write",
     "lint": "eslint",
