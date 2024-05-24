@@ -6,7 +6,7 @@ import {
   string,
   uuidV,
 } from "fast-check";
-import { User } from "../core";
+import { User } from "./UserEntity";
 
 export const UserArbitrary = (overrides?: Partial<User>): Arbitrary<User> => {
   return record({

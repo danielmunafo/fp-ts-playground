@@ -1,8 +1,8 @@
+import { UserArbitrary } from "@fp-ts-playground/core";
+import { InMemoryUserRepository } from "@fp-ts-playground/infrastructure";
 import { assert, asyncProperty } from "fast-check";
 import { isRight } from "fp-ts/Either";
 import { getLeft, isSome } from "fp-ts/Option";
-import { InMemoryUserRepository } from "../../infrastructure";
-import { UserArbitrary } from "../../test";
 import { EmailInUseError } from "./errors";
 import { registerUser } from "./registerUser";
 

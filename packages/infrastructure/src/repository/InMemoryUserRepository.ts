@@ -1,6 +1,6 @@
+import { User, UserRepositoryPort } from "@fp-ts-playground/core";
 import { Option, none, some } from "fp-ts/Option";
 import { TaskEither, right, tryCatch } from "fp-ts/TaskEither";
-import { User, UserRepositoryPort } from "../../core";
 
 export enum SaveResult {
   Update = "update",

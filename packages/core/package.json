@@ -1,0 +1,14 @@
+{
+  "name": "@fp-ts-playground/core",
+  "version": "1.0.0",
+  "description": "Core/Domain package",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
+  "author": "dann.tostes@gmail.com",
+  "license": "MIT",
+  "private": true
+}
