@@ -1,4 +1,4 @@
-import { UserArbitrary } from "@fp-ts-playground/core";
+import { UserArbitrary, UserRepositoryPort } from "@fp-ts-playground/core";
 import { InMemoryUserRepository } from "@fp-ts-playground/infrastructure";
 import { assert, asyncProperty } from "fast-check";
 import { isRight } from "fp-ts/Either";
@@ -11,7 +11,7 @@ describe("registerUser", () => {
     await assert(
       asyncProperty(UserArbitrary(), async (user) => {
         // Given a valid user
-        const userRepository = new InMemoryUserRepository();
+        const userRepository: UserRepositoryPort = new InMemoryUserRepository();
         const register = registerUser(userRepository);
 
         // When trying to register it
@@ -29,7 +29,7 @@ describe("registerUser", () => {
     await assert(
       asyncProperty(UserArbitrary(), async (user) => {
         // Given an already registered user
-        const userRepository = new InMemoryUserRepository();
+        const userRepository: UserRepositoryPort = new InMemoryUserRepository();
         const register = registerUser(userRepository);
 
         const newUserResult = await register(user)();
