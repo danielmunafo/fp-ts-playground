@@ -12,7 +12,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@fp-ts-playground/core": "*",
-    "@fp-ts-playground/infrastructure": "*"
+    "@fp-ts-playground/core": "*"
   }
 }
