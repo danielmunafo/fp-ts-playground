@@ -1,10 +1,9 @@
+import { EmailInUseError, registerUser } from "@fp-ts-playground/application";
 import { UserArbitrary, UserRepositoryPort } from "@fp-ts-playground/core";
 import { InMemoryUserRepository } from "@fp-ts-playground/infrastructure";
 import { assert, asyncProperty } from "fast-check";
 import { isRight } from "fp-ts/Either";
 import { getLeft, isSome } from "fp-ts/Option";
-import { EmailInUseError } from "./errors";
-import { registerUser } from "./registerUser";
 
 describe("registerUser", () => {
   it("should successfully register a user", async () => {

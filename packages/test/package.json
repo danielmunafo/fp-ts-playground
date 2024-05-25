@@ -1,7 +1,7 @@
 {
-  "name": "@fp-ts-playground/application",
+  "name": "@fp-ts-playground/test",
   "version": "1.0.0",
-  "description": "Application package",
+  "description": "Main package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -12,6 +12,8 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@fp-ts-playground/core": "*"
+    "@fp-ts-playground/core": "*",
+    "@fp-ts-playground/infrastructure": "*",
+    "@fp-ts-playground/application": "*"
   }
 }
