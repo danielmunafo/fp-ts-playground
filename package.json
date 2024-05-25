@@ -34,7 +34,7 @@
   "scripts": {
     "build": "lerna run build",
     "dev": "ts-node ./example/index.ts",
-    "test": "jest",
+    "test": "lerna run test",
     "prettify": "prettier . --write",
     "lint": "eslint",
     "prepare": "husky"
