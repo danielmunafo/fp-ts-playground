@@ -20,8 +20,8 @@ const config: Config = {
   },
   projects: ["<rootDir>/packages/*/jest.config.ts"],
   collectCoverage: true,
-  coverageDirectory: '<rootDir>/coverage',
-  coverageReporters: ['json', 'lcov', 'text', 'clover'],
+  coverageDirectory: "<rootDir>/coverage",
+  coverageReporters: ["json", "lcov", "text", "clover"],
 };
 
 export default config;
