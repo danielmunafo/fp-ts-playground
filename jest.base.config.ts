@@ -1,5 +1,15 @@
 import type { Config } from "jest";
 
+export const packageOverrideConfigs = (packageName: string) => ({
+  testMatch: [
+    `<rootDir>/packages/${packageName}/**/__tests__/**/*.ts`,
+    `<rootDir>/packages/${packageName}/**/?(*.)+(spec|test).ts`,
+  ],
+  projects: undefined,
+  collectCoverage: undefined,
+  coverageReporters: undefined,
+});
+
 const config: Config = {
   clearMocks: true,
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],

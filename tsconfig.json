@@ -10,7 +10,7 @@
     "emitDeclarationOnly": false,
     "strict": true,
     "module": "commonjs",
-    "target": "es6",
+    "target": "ES2022",
     "outDir": "./dist"
   },
   "include": ["packages/*/src"],
