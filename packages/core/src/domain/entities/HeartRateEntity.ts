@@ -1,7 +1,8 @@
-import * as E from "fp-ts/Either";
+import { Either } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { date, withMessage } from "io-ts-types";
-import { UUIDv4 } from "../../common";
+import { AttributesOnly, UUIDv4, ValidationResult } from "../../common";
+import { Entity } from "./Entity";
 
 export interface MinMaxNumberBrand {
   readonly MinMaxNumber: unique symbol;
@@ -28,8 +29,18 @@ const HeartRateCodec = t.type({
   timestamp: Timestamp,
 });
 
-type ValidationResult<A> = E.Either<t.Errors, A>;
-export type HeartRate = t.TypeOf<typeof HeartRateCodec>;
+export class HeartRateEntity implements Entity {
+  public readonly userId: string;
+  public readonly value: number;
+  public readonly timestamp: Date;
 
-export const validateHeartRate = (data: unknown): ValidationResult<HeartRate> =>
-  HeartRateCodec.decode(data);
+  constructor({ userId, value, timestamp }: AttributesOnly<HeartRateEntity>) {
+    this.userId = userId;
+    this.value = value;
+    this.timestamp = timestamp;
+  }
+
+  validate(): ValidationResult<HeartRateEntity> {
+    return HeartRateCodec.decode(this) as Either<t.Errors, HeartRateEntity>;
+  }
+}

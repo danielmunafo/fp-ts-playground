@@ -1,7 +1,7 @@
 import { assert, oneof, property, sample } from "fast-check";
 import { isLeft, isRight } from "fp-ts/Either";
 import { invalidTimestampArbitraries, invalidUuidV4 } from "../../common";
-import { validateHeartRate } from "./HeartRateEntity";
+import { HeartRateEntity } from "./HeartRateEntity";
 import {
   HeartRateArbitrary,
   invalidHeartRateValue,
@@ -10,8 +10,8 @@ import {
 describe("HeartRate entity", () => {
   it("should conform to the HeartRate domain model", () => {
     assert(
-      property(HeartRateArbitrary(), (HeartRate) => {
-        const validationResult = validateHeartRate(HeartRate);
+      property(HeartRateArbitrary(), (heartRate) => {
+        const validationResult = new HeartRateEntity(heartRate).validate();
         const success = isRight(validationResult);
         expect(success).toBeTruthy();
       }),
@@ -49,7 +49,7 @@ describe("HeartRate entity", () => {
             [field]: invalidInput,
           });
           const heartRate = sample(heartRateArbitrary, 1)[0];
-          const validationResult = validateHeartRate(heartRate);
+          const validationResult = new HeartRateEntity(heartRate).validate();
           const error = isLeft(validationResult);
           if (error) {
             expect(
