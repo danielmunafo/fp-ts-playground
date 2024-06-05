@@ -1,4 +1,7 @@
+import * as fs from "fs";
 import type { Config } from "jest";
+
+const swcConfig = JSON.parse(fs.readFileSync(`${__dirname}/.swcrc`, "utf-8"));
 
 export const packageOverrideConfigs = (packageName: string) => ({
   testMatch: [
@@ -16,18 +19,18 @@ const config: Config = {
   moduleNameMapper: {
     "^@fp-ts-playground/(.*)$": "<rootDir>/packages/$1/src",
   },
-  preset: "ts-jest",
   rootDir: "../../",
   testEnvironment: "node",
   testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
   transform: {
-    "^.+\\.ts$": [
-      "ts-jest",
+    "^.+\\.(t|j)sx?$": [
+      "@swc/jest",
       {
-        tsconfig: "tsconfig.json",
+        ...swcConfig,
       },
     ],
   },
+  testTimeout: 200,
   projects: ["<rootDir>/packages/*/jest.config.ts"],
   collectCoverage: true,
   coverageDirectory: "<rootDir>/coverage",

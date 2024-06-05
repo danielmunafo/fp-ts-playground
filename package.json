@@ -10,6 +10,9 @@
     "packages/*"
   ],
   "devDependencies": {
+    "@swc/core": "^1.5.25",
+    "@swc/helpers": "^0.5.11",
+    "@swc/jest": "^0.2.36",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
@@ -23,7 +26,6 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
-    "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.3"
   },
@@ -42,13 +44,15 @@
   },
   "dependencies": {
     "@kafkajs/confluent-schema-registry": "^3.3.0",
-    "avsc": "^5.7.7",
     "dotenv": "^16.4.5",
     "fp-ts": "^2.16.5",
     "io-ts": "^2.2.21",
     "io-ts-types": "^0.5.19",
+    "kafka": "^0.2.3",
+    "kafkajs": "^2.2.4",
     "monocle-ts": "^2.3.13",
     "newtype-ts": "^0.3.5",
+    "rxjs": "^7.8.1",
     "winston": "^3.13.0"
   }
 }
