@@ -1,13 +1,12 @@
-import * as avro from "avsc";
+import { AvroConfluentSchema } from "./types";
 
-export const HeartRateSchema = {
-  type: "record",
+export const HeartRateRecordedSchema: AvroConfluentSchema = {
+  namespace: "smart-health",
   name: "HeartRate",
+  type: "record",
   fields: [
     { name: "userId", type: "string" },
     { name: "value", type: "int" },
     { name: "timestamp", type: "string" },
   ],
 };
-
-export const HeartRateAvroSchema = avro.Type.forSchema(Object(HeartRateSchema));
