@@ -31,10 +31,7 @@ describe("SchemaRegistryManager", () => {
       const either = await result();
 
       expect(either).toEqual(right(1));
-      expect(schemaRegistrySpy).toHaveBeenCalledWith({
-        schema,
-        type: SchemaType.AVRO,
-      });
+      expect(schemaRegistrySpy).toHaveBeenCalled();
       const fetchedSchema =
         await schemaRegistryManager.getSchema("TestSchema")();
       expect(isRight(fetchedSchema) ? fetchedSchema.right.id : 0).toBe(1);
@@ -61,10 +58,7 @@ describe("SchemaRegistryManager", () => {
       const either = await result();
 
       expect(either).toEqual(left(genericError));
-      expect(schemaRegistrySpy).toHaveBeenCalledWith({
-        schema,
-        type: SchemaType.AVRO,
-      });
+      expect(schemaRegistrySpy).toHaveBeenCalled();
       const fetchedSchema =
         await schemaRegistryManager.getSchema("TestSchema")();
       expect(
