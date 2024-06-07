@@ -1,6 +1,7 @@
 import { SchemaRegistry, SchemaType } from "@kafkajs/confluent-schema-registry";
 import { isLeft, isRight, left, right } from "fp-ts/Either";
 import { TaskEither } from "fp-ts/TaskEither";
+import { debugLogger } from "../logger";
 import { SchemaRegistryManager } from "./SchemaRegistryManager";
 import { AvroConfluentSchema } from "./schemas";
 
@@ -20,7 +21,10 @@ describe("SchemaRegistryManager", () => {
       const schemaRegistrySpy = jest
         .spyOn(schemaRegistry, "register")
         .mockResolvedValue({ id: 1 });
-      const schemaRegistryManager = new SchemaRegistryManager(schemaRegistry);
+      const schemaRegistryManager = new SchemaRegistryManager(
+        schemaRegistry,
+        debugLogger,
+      );
 
       const result: TaskEither<Error, number> =
         schemaRegistryManager.registerSchema(schema);
@@ -32,8 +36,8 @@ describe("SchemaRegistryManager", () => {
         type: SchemaType.AVRO,
       });
       const fetchedSchema =
-        await schemaRegistryManager.getSchemaId("TestSchema")();
-      expect(isRight(fetchedSchema) ? fetchedSchema.right : 0).toBe(1);
+        await schemaRegistryManager.getSchema("TestSchema")();
+      expect(isRight(fetchedSchema) ? fetchedSchema.right.id : 0).toBe(1);
     });
 
     it("should handle errors during schema registration", async () => {
@@ -47,7 +51,10 @@ describe("SchemaRegistryManager", () => {
       const schemaRegistrySpy = jest
         .spyOn(schemaRegistry, "register")
         .mockRejectedValue(genericError);
-      const schemaRegistryManager = new SchemaRegistryManager(schemaRegistry);
+      const schemaRegistryManager = new SchemaRegistryManager(
+        schemaRegistry,
+        debugLogger,
+      );
 
       const result: TaskEither<Error, number> =
         schemaRegistryManager.registerSchema(schema);
@@ -59,7 +66,7 @@ describe("SchemaRegistryManager", () => {
         type: SchemaType.AVRO,
       });
       const fetchedSchema =
-        await schemaRegistryManager.getSchemaId("TestSchema")();
+        await schemaRegistryManager.getSchema("TestSchema")();
       expect(
         isLeft(fetchedSchema) ? fetchedSchema.left : undefined,
       ).toBeDefined();

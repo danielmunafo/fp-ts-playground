@@ -1,8 +1,9 @@
 import { AvroConfluentSchema } from "./types";
 
+export const HEART_RATE_SCHEMA_NAME = "HeartRate";
 export const HeartRateRecordedSchema: AvroConfluentSchema = {
-  namespace: "smart-health",
-  name: "HeartRate",
+  namespace: "smart_health",
+  name: HEART_RATE_SCHEMA_NAME,
   type: "record",
   fields: [
     { name: "userId", type: "string" },

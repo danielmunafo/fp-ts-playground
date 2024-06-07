@@ -10,23 +10,23 @@ PROJECT_DIR="$SCRIPT_DIR"
 # Navigate to the project directory
 cd "$PROJECT_DIR" || exit
 
-# Function to stop Docker Compose services
-stop_when_command() {
-  echo "Stopping Docker Compose services due to command..."
-  docker-compose down
-  echo "Docker Compose services stopped."
-}
+ Function to stop Docker Compose services
+ stop_when_command() {
+   echo "Stopping Docker Compose services due to command..."
+   docker-compose down
+   echo "Docker Compose services stopped."
+ }
 
-# Trap termination signals (e.g., SIGINT, SIGTERM) to stop services
-trap stop_when_command SIGINT SIGTERM
+ # Trap termination signals (e.g., SIGINT, SIGTERM) to stop services
+ trap stop_when_command SIGINT SIGTERM
 
-# Teardown existing Docker Compose services if they are running
-echo "Checking if Docker Compose services are already running..."
-if docker-compose ps | grep -q "Up"; then
-  echo "Docker Compose services are already running. Tearing down existing services..."
-  docker-compose down
-  echo "Existing services have been stopped."
-fi
+ Teardown existing Docker Compose services if they are running
+ echo "Checking if Docker Compose services are already running..."
+ if docker-compose ps | grep -q "Up"; then
+   echo "Docker Compose services are already running. Tearing down existing services..."
+   docker-compose down
+   echo "Existing services have been stopped."
+ fi
 
 # Build the Docker images
 echo "Building Docker images..."
