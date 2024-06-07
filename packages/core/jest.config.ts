@@ -1,9 +1,8 @@
 import { Config } from "jest";
-import baseConfig, { packageOverrideConfigs } from "../../jest.base.config";
+import { getConfig } from "../../jest.base.config";
 
 const config: Config = {
-  ...baseConfig,
-  ...packageOverrideConfigs("core"),
+  ...getConfig("core"),
 };
 
 export default config;

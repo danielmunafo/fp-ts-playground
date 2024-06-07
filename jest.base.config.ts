@@ -3,16 +3,6 @@ import type { Config } from "jest";
 
 const swcConfig = JSON.parse(fs.readFileSync(`${__dirname}/.swcrc`, "utf-8"));
 
-export const packageOverrideConfigs = (packageName: string) => ({
-  testMatch: [
-    `<rootDir>/packages/${packageName}/**/__tests__/**/*.ts`,
-    `<rootDir>/packages/${packageName}/**/?(*.)+(spec|test).ts`,
-  ],
-  projects: undefined,
-  collectCoverage: undefined,
-  coverageReporters: undefined,
-});
-
 const config: Config = {
   clearMocks: true,
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
@@ -35,6 +25,24 @@ const config: Config = {
   collectCoverage: true,
   coverageDirectory: "<rootDir>/coverage",
   coverageReporters: ["json", "lcov", "text", "clover"],
+};
+
+export const getConfig = (packageName: string, defaultConfig = config) => {
+  const updatedConfig = {
+    ...defaultConfig,
+    testMatch: [
+      `<rootDir>/packages/${packageName}/**/__tests__/**/*.ts`,
+      `<rootDir>/packages/${packageName}/**/?(*.)+(spec|test).ts`,
+    ],
+    projects: undefined,
+    collectCoverage: undefined,
+    coverageReporters: undefined,
+  };
+  delete updatedConfig.projects;
+  delete updatedConfig.collectCoverage;
+  delete updatedConfig.coverageReporters;
+
+  return updatedConfig;
 };
 
 export default config;
