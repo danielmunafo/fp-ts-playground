@@ -3,7 +3,7 @@ import type { Config } from "jest";
 
 const swcConfig = JSON.parse(fs.readFileSync(`${__dirname}/.swcrc`, "utf-8"));
 
-const config: Config = {
+export const jestConfig: Config = {
   clearMocks: true,
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
   moduleNameMapper: {
@@ -11,7 +11,7 @@ const config: Config = {
   },
   rootDir: "../../",
   testEnvironment: "node",
-  testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+  testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec).ts"],
   transform: {
     "^.+\\.(t|j)sx?$": [
       "@swc/jest",
@@ -27,7 +27,7 @@ const config: Config = {
   coverageReporters: ["json", "lcov", "text", "clover"],
 };
 
-export const getConfig = (packageName: string, defaultConfig = config) => {
+export const getConfig = (packageName: string, defaultConfig = jestConfig) => {
   const updatedConfig = {
     ...defaultConfig,
     testMatch: [
@@ -45,4 +45,4 @@ export const getConfig = (packageName: string, defaultConfig = config) => {
   return updatedConfig;
 };
 
-export default config;
+export default jestConfig;

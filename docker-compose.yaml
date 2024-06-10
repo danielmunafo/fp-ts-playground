@@ -1,30 +1,38 @@
-version: "3.8"
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - "2181:2181"
+      - "${ZOOKEEPER_CLIENT_PORT}:${ZOOKEEPER_CLIENT_PORT}"
     hostname: zookeeper
+    healthcheck:
+      test: echo ruok | nc 127.0.0.1 ${ZOOKEEPER_CLIENT_PORT} || exit -1
+      interval: 5s
+      timeout: 5s
+      retries: 6
 
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"
+      - "${KAFKA_CLIENT_PORT}:${KAFKA_CLIENT_PORT}"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_CLIENT_PORT}
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://${KAFKA_CLIENT_HOST}:${KAFKA_CLIENT_PORT}
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
+    healthcheck:
+      test: kafka-topics --bootstrap-server kafka:29092 --list
+      interval: 5s
+      timeout: 5s
+      retries: 6
 
   schema-registry:
     image: confluentinc/cp-schema-registry:latest
@@ -33,7 +41,12 @@ services:
     environment:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:${SCHEMA_REGISTRY_CLIENT_PORT}
     ports:
-      - "8081:8081"
+      - "${SCHEMA_REGISTRY_CLIENT_PORT}:${SCHEMA_REGISTRY_CLIENT_PORT}"
     hostname: schema-registry
+    healthcheck:
+      test: curl --output /dev/null --silent --head --fail http://schema-registry:${SCHEMA_REGISTRY_CLIENT_PORT}/subjects
+      interval: 5s
+      timeout: 5s
+      retries: 6

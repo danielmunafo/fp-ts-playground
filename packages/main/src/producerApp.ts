@@ -13,10 +13,8 @@ import { Kafka, Partitioners } from "kafkajs";
 import path from "path";
 import { interval, map } from "rxjs";
 
-dotenv.config({ path: path.resolve(__dirname, "../../config/.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../../config/.env.local") });
 
-const DEFAULT_SCHEMA_REGISTRY_HOST = "http://localhost:8081";
-const DEFAULT_BROKER = "localhost:9092";
 const DEFAULT_CLIENT_ID = "health-producer";
 
 (async () => {
@@ -24,15 +22,18 @@ const DEFAULT_CLIENT_ID = "health-producer";
     process.env.KAFKAJS_NO_PARTITIONER_WARNING = "1";
   }
 
-  const kafka = new Kafka({
+  const KAFKA_BROKER = `${process.env.KAFKA_CLIENT_HOST}:${process.env.KAFKA_CLIENT_PORT}`;
+  const kafkaParameters = {
     clientId: DEFAULT_CLIENT_ID,
-    brokers: [DEFAULT_BROKER],
+    brokers: [KAFKA_BROKER],
     retry: {
       retries: 5,
       initialRetryTime: 1000,
     },
     connectionTimeout: 25000,
-  });
+  };
+  defaultLogger.debug("Kafka Client", kafkaParameters);
+  const kafka = new Kafka(kafkaParameters);
   const producer = kafka.producer({
     createPartitioner: Partitioners.LegacyPartitioner,
   });
@@ -59,10 +60,12 @@ const DEFAULT_CLIENT_ID = "health-producer";
   try {
     await producer.connect();
 
+    const schemaRegistryParams = {
+      host: `${process.env.SCHEMA_REGISTRY_CLIENT_HOST}:${process.env.SCHEMA_REGISTRY_CLIENT_PORT}`,
+    };
+    defaultLogger.debug("Schema Registry", schemaRegistryParams);
     const schemaRegistryManager = new SchemaRegistryManager(
-      new SchemaRegistry({
-        host: process.env.SCHEMA_REGISTRY_HOST || DEFAULT_SCHEMA_REGISTRY_HOST,
-      }),
+      new SchemaRegistry(schemaRegistryParams),
       defaultLogger,
     );
     await schemaRegistryManager.initialize();
