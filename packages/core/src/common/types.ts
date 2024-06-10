@@ -35,3 +35,12 @@ export const UUIDv4 = withMessage(
   ),
   () => "Invalid UUID v4",
 );
+
+export type ValidationResult<A> = E.Either<t.Errors, A>;
+
+export type AttributesOnly<T> = Pick<
+  T,
+  {
+    [K in keyof T]: T[K] extends (...args: any[]) => any ? never : K;
+  }[keyof T]
+>;

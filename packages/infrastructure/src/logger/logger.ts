@@ -5,8 +5,8 @@ import {
   Logger as WinstonLogger,
 } from "winston";
 
-const logger = createLogger({
-  level: "info",
+const defaultConfig = {
+  level: "debug",
   format: format.combine(
     format.timestamp(),
     process.env.NODE_ENV === "production"
@@ -17,7 +17,9 @@ const logger = createLogger({
     new transports.Console(),
     new transports.File({ filename: "combined.log" }),
   ],
-});
+};
+const logger = createLogger(defaultConfig);
 
+export const debugLogger = createLogger(defaultConfig);
 export type Logger = WinstonLogger;
 export default logger;

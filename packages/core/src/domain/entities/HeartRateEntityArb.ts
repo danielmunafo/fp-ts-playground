@@ -1,7 +1,8 @@
 import { Arbitrary, constant, date, integer, record, uuidV } from "fast-check";
 import * as t from "io-ts";
+import { AttributesOnly } from "../../common";
 import {
-  HeartRate,
+  HeartRateEntity,
   MAX_HEART_RATE,
   MIN_HEART_RATE,
   MinMaxNumberBrand,
@@ -31,8 +32,8 @@ export const invalidHeartRateValue = [
 ];
 
 export const HeartRateArbitrary = (
-  overrides?: Partial<HeartRate>,
-): Arbitrary<HeartRate> => {
+  overrides?: Partial<HeartRateEntity>,
+): Arbitrary<AttributesOnly<HeartRateEntity>> => {
   return record({
     userId: overrides?.userId ? constant(overrides.userId) : uuidV(4),
     value: overrides?.value

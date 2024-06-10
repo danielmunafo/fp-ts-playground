@@ -1,8 +1,8 @@
 import { Config } from "jest";
-import baseConfig from "../../jest.base.config";
+import { getConfig } from "../../jest.base.config";
 
 const config: Config = {
-  ...baseConfig,
+  ...getConfig("infrastructure"),
 };
 
 export default config;

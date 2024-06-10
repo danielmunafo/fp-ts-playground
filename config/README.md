@@ -1,3 +1,3 @@
 # Usage
 
-To initialize your `.env` file, clone `.env.example`
+To initialize your `.env.local` file, clone `.env.example`
