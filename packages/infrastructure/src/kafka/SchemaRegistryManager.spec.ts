@@ -1,4 +1,4 @@
-import { SchemaRegistry, SchemaType } from "@kafkajs/confluent-schema-registry";
+import { SchemaRegistry } from "@kafkajs/confluent-schema-registry";
 import { isLeft, isRight, left, right } from "fp-ts/Either";
 import { TaskEither } from "fp-ts/TaskEither";
 import { debugLogger } from "../logger";

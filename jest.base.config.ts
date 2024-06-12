@@ -33,6 +33,7 @@ export const getConfig = (packageName: string, defaultConfig = jestConfig) => {
     testMatch: [
       `<rootDir>/packages/${packageName}/**/__tests__/**/*.ts`,
       `<rootDir>/packages/${packageName}/**/?(*.)+(spec|test).ts`,
+      "!**/*.(integrated.spec).ts",
     ],
     projects: undefined,
     collectCoverage: undefined,

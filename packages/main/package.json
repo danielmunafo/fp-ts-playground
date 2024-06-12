@@ -6,7 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "test:unit": "jest --passWithNoTests",
+    "test:integrated": "echo no integrated tests."
   },
   "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
   "author": "dann.tostes@gmail.com",
