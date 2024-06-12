@@ -8,7 +8,7 @@
     "build": "tsc",
     "test": "jest",
     "test:unit": "jest",
-    "test:integrated": "jest"
+    "test:integrated": "echo no integrated tests."
   },
   "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
   "author": "dann.tostes@gmail.com",

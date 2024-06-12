@@ -1,7 +1,6 @@
 import { HeartRateArbitrary, HeartRateEntity } from "@fp-ts-playground/core";
 import {
   HEART_RATE_SCHEMA_NAME,
-  KafkaHealthMetricsProducer,
   SchemaRegistryManager,
   defaultLogger,
 } from "@fp-ts-playground/infrastructure";
@@ -11,7 +10,6 @@ import { sample } from "fast-check";
 import { isLeft } from "fp-ts/lib/Either";
 import { Kafka, Partitioners } from "kafkajs";
 import path from "path";
-import { interval, map } from "rxjs";
 
 dotenv.config({ path: path.resolve(__dirname, "../../../config/.env.local") });
 
@@ -94,22 +92,6 @@ const DEFAULT_CLIENT_ID = "health-producer";
       messagePayload,
       fromDataBufferedValue,
     });
-
-    const heartRateObservableGenerator = () =>
-      new HeartRateEntity({
-        ...sample(HeartRateArbitrary({ timestamp: new Date() }), 1)[0],
-      });
-    const POOL_TIME = 1000;
-    const heartRateObservable$ = interval(POOL_TIME).pipe(
-      map(heartRateObservableGenerator),
-    );
-    const producerMockRunTask = new KafkaHealthMetricsProducer<HeartRateEntity>(
-      producer,
-      defaultLogger,
-      heartRateObservable$,
-      heartRateSchema,
-    ).run();
-    await producerMockRunTask();
   } catch (error) {
     defaultLogger.error(
       "Something wrong happened while trying to run kafkaHealthMetricsProducer",
