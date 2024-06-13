@@ -14,7 +14,6 @@ stop_when_command() {
   echo "Stopping Docker Compose services due to command..."
   docker-compose --env-file "$ENV_FILE" down
   echo "Docker Compose services stopped."
-  kill -- -$$
   exit 0
 }
 

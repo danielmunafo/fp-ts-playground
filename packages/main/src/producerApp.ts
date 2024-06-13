@@ -1,101 +1,137 @@
 import { HeartRateArbitrary, HeartRateEntity } from "@fp-ts-playground/core";
 import {
+  DateType,
   HEART_RATE_SCHEMA_NAME,
+  KafkaEntityProducer,
   SchemaRegistryManager,
   defaultLogger,
 } from "@fp-ts-playground/infrastructure";
-import { SchemaRegistry } from "@kafkajs/confluent-schema-registry";
+import { SchemaRegistry, SchemaType } from "@kafkajs/confluent-schema-registry";
 import * as dotenv from "dotenv";
 import { sample } from "fast-check";
-import { isLeft } from "fp-ts/lib/Either";
-import { Kafka, Partitioners } from "kafkajs";
+import { Right, isLeft } from "fp-ts/lib/Either";
+import { Kafka, Partitioners, Producer, RecordMetadata } from "kafkajs";
 import path from "path";
+import { range, timer } from "rxjs";
+import { concatMap, finalize, map } from "rxjs/operators";
 
 dotenv.config({ path: path.resolve(__dirname, "../../../config/.env.local") });
 
 const DEFAULT_CLIENT_ID = "health-producer";
 
-(async () => {
+const KAFKA_BROKER = `${process.env.KAFKA_CLIENT_HOST}:${process.env.KAFKA_CLIENT_PORT}`;
+const kafkaParameters = {
+  clientId: DEFAULT_CLIENT_ID,
+  brokers: [KAFKA_BROKER],
+  retry: {
+    retries: 5,
+    initialRetryTime: 1000,
+  },
+  connectionTimeout: 25000,
+};
+const schemaRegistryParams = {
+  host: `${process.env.SCHEMA_REGISTRY_CLIENT_HOST}:${process.env.SCHEMA_REGISTRY_CLIENT_PORT}`,
+};
+const schemaRegistryOptions = {
+  [SchemaType.AVRO]: {
+    logicalTypes: { "timestamp-millis": DateType },
+  },
+};
+const DEFAULT_PARAMETERS = {
+  kafka: new Kafka(kafkaParameters),
+  iterations: 1000,
+  schemaRegistryManager: new SchemaRegistryManager(
+    new SchemaRegistry(schemaRegistryParams, schemaRegistryOptions),
+    defaultLogger,
+  ),
+  schemaName: HEART_RATE_SCHEMA_NAME,
+};
+
+const shutdown = async (producer: Producer) => {
+  defaultLogger.info(
+    "Received termination signal, shutting kafka producer down...",
+  );
+
+  try {
+    await producer.disconnect();
+    defaultLogger.info("Successfully disconnected kafka producer");
+  } catch (error) {
+    defaultLogger.error("Error occurred while disconnecting kafka producer", {
+      error,
+    });
+  } finally {
+    process.exit(0);
+  }
+};
+
+export const producerApp = async ({
+  kafka,
+  iterations,
+  schemaRegistryManager,
+  schemaName,
+} = DEFAULT_PARAMETERS) => {
   if (process.env.NODE_ENV !== "production") {
     process.env.KAFKAJS_NO_PARTITIONER_WARNING = "1";
   }
 
-  const KAFKA_BROKER = `${process.env.KAFKA_CLIENT_HOST}:${process.env.KAFKA_CLIENT_PORT}`;
-  const kafkaParameters = {
-    clientId: DEFAULT_CLIENT_ID,
-    brokers: [KAFKA_BROKER],
-    retry: {
-      retries: 5,
-      initialRetryTime: 1000,
-    },
-    connectionTimeout: 25000,
-  };
-  defaultLogger.debug("Kafka Client", kafkaParameters);
-  const kafka = new Kafka(kafkaParameters);
   const producer = kafka.producer({
     createPartitioner: Partitioners.LegacyPartitioner,
   });
-
-  const shutdown = async () => {
-    defaultLogger.info(
-      "Received termination signal, shutting kafka producer down...",
-    );
-
-    try {
-      await producer.disconnect();
-      defaultLogger.info("Successfully disconnected kafka producer");
-    } catch (error) {
-      defaultLogger.error("Error occurred while disconnecting kafka producer", {
-        error,
-      });
-    } finally {
-      process.exit(0);
-    }
-  };
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", () => shutdown(producer));
+  process.on("SIGINT", () => shutdown(producer));
 
   try {
     await producer.connect();
-
-    const schemaRegistryParams = {
-      host: `${process.env.SCHEMA_REGISTRY_CLIENT_HOST}:${process.env.SCHEMA_REGISTRY_CLIENT_PORT}`,
-    };
-    defaultLogger.debug("Schema Registry", schemaRegistryParams);
-    const schemaRegistryManager = new SchemaRegistryManager(
-      new SchemaRegistry(schemaRegistryParams),
-      defaultLogger,
-    );
     await schemaRegistryManager.initialize();
-
-    const schemaTask = schemaRegistryManager.getSchema(HEART_RATE_SCHEMA_NAME);
-    const schema = await schemaTask();
-    if (isLeft(schema)) {
+    const schemaTask = schemaRegistryManager.getSchema(schemaName);
+    const registeredSchema = await schemaTask();
+    if (isLeft(registeredSchema)) {
       throw new Error("Invalid schema name");
     }
-    const heartRateSchema = schema.right;
+    const schema = registeredSchema.right;
 
-    const heartRate = new HeartRateEntity({
-      ...sample(HeartRateArbitrary({ timestamp: new Date() }), 1)[0],
-    });
-    const fromDataBufferedValue = await heartRateSchema.encode({
-      ...heartRate,
-      timestamp: heartRate.timestamp.toISOString(),
-    });
-    const messagePayload = { value: fromDataBufferedValue };
-    const result = await producer.send({
-      topic: "health_metrics",
-      messages: [messagePayload],
-    });
-    defaultLogger.info("Sent data", {
-      result,
-      messagePayload,
-      fromDataBufferedValue,
+    const kafkaEntityProducer = new KafkaEntityProducer(
+      producer,
+      defaultLogger,
+      schema,
+      "heart_rate",
+    );
+
+    const source$ = range(0, iterations).pipe(
+      concatMap((i) =>
+        timer(i * 5000).pipe(
+          // Delay each message by 5 seconds
+          map(
+            () => sample(HeartRateArbitrary({ timestamp: new Date() }), 1)[0],
+          ),
+          map(
+            (heartRateArbitrary) =>
+              new HeartRateEntity({
+                ...heartRateArbitrary,
+              }),
+          ),
+          concatMap((heartRate) =>
+            kafkaEntityProducer.sendMessage(heartRate)(),
+          ),
+        ),
+      ),
+      finalize(() => {
+        producer.disconnect();
+      }),
+    );
+
+    // Subscribe to the observable
+    source$.subscribe({
+      next: (result) =>
+        defaultLogger.info("Sent data", {
+          result: (result as Right<RecordMetadata[]>).right,
+        }),
+      error: (error) => defaultLogger.error("Error in data stream", { error }),
+      complete: () => defaultLogger.info("Completed sending data"),
     });
   } catch (error) {
-    defaultLogger.error(
-      "Something wrong happened while trying to run kafkaHealthMetricsProducer",
-      { error },
-    );
+    throw new Error("producerApp failed to run.", { cause: error });
   }
-})();
+};
+
+producerApp();
