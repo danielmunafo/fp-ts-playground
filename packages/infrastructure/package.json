@@ -6,7 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "yarn test:unit && yarn test:integrated",
+    "test:unit": "jest --config ./jest.config.ts",
+    "test:integrated": "./setup-integrated-test.sh"
   },
   "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
   "author": "dann.tostes@gmail.com",

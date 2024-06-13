@@ -1,13 +1,13 @@
 {
-  "name": "@fp-ts-playground/test",
+  "name": "@fp-ts-playground/main",
   "version": "1.0.0",
   "description": "Main package",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "test:unit": "jest",
+    "test": "jest --passWithNoTests",
+    "test:unit": "jest --passWithNoTests",
     "test:integrated": "echo no integrated tests."
   },
   "repository": "https://github.com/danielmunafo/fp-ts-playground.git",
@@ -15,8 +15,6 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@fp-ts-playground/core": "*",
-    "@fp-ts-playground/infrastructure": "*",
-    "@fp-ts-playground/application": "*"
+    "@fp-ts-playground/infrastructure": "*"
   }
 }
