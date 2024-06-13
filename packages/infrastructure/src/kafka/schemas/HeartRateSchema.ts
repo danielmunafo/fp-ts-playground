@@ -8,6 +8,9 @@ export const HeartRateRecordedSchema: AvroConfluentSchema = {
   fields: [
     { name: "userId", type: "string" },
     { name: "value", type: "int" },
-    { name: "timestamp", type: "string" },
+    {
+      name: "timestamp",
+      type: { type: "long", logicalType: "timestamp-millis" },
+    },
   ],
 };

@@ -37,13 +37,16 @@
     "dev:producer": "./start-producer.sh ./config/.env.local",
     "build": "lerna run build",
     "dev:ts-node:producer": "ts-node ./packages/main/src/producerApp.ts",
-    "test": "lerna run test",
+    "test:unit": "lerna run test:unit --parallel",
+    "test:integrated": "lerna run test:integrated --concurrency 1",
+    "test": "yarn test:unit && yarn test:integrated",
     "prettify": "prettier . --write",
     "lint": "eslint",
     "prepare": "husky"
   },
   "dependencies": {
     "@kafkajs/confluent-schema-registry": "^3.3.0",
+    "avsc": "^5.7.7",
     "dotenv": "^16.4.5",
     "fp-ts": "^2.16.5",
     "io-ts": "^2.2.21",
